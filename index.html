@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Lua Obfuscator (Glassmorphism Edition)</title>
+  <meta charset="UTF-8" />
+  <link rel="shortcut icon" href="img/favicon.ico" />
+  <!-- Google Font -->
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap"
+    rel="stylesheet"
+  />
+  <style>
+    /* GLOBAL RESET */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: "Poppins", sans-serif;
+      background: linear-gradient(115deg, #243B55 0%, #141E30 100%);
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* CONTAINER WITH GLASSMORPHISM */
+    #container {
+      position: relative;
+      width: 80%;
+      max-width: 800px;
+      margin: 20px auto;
+      padding: 30px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+      /* Fade-in animation */
+      opacity: 0;
+      animation: fadeIn 1s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      to {
+        opacity: 1;
+      }
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      margin-bottom: 20px;
+    }
+
+    form {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 1rem;
+      margin-bottom: 10px;
+    }
+
+    textarea {
+      width: 90%;
+      padding: 12px;
+      border: none;
+      border-radius: 10px;
+      background-color: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      color: #ffffff;
+      font-size: 0.95rem;
+      resize: none;
+      outline: none;
+      transition: background 0.3s;
+    }
+
+    textarea:focus {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    input[type="submit"],
+    button {
+      display: inline-block;
+      background-color: rgba(246, 114, 128, 0.8);
+      color: #ffffff;
+      padding: 10px 20px;
+      margin-top: 10px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 0.95rem;
+      font-weight: 500;
+      transition: background-color 0.3s, transform 0.3s;
+      outline: none;
+    }
+
+    input[type="submit"]:hover,
+    button:hover {
+      background-color: rgba(246, 114, 128, 1);
+      transform: translateY(-2px);
+    }
+
+    h2 {
+      text-align: center;
+      margin-top: 30px;
+      margin-bottom: 10px;
+      font-size: 1.1rem;
+      font-weight: 500;
+    }
+
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      background-color: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      padding: 20px;
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+      color: #ffffff;
+      user-select: none;
+      pointer-events: none;
+      transition: background 0.3s;
+    }
+
+    pre:hover {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+
+    #downloadButton {
+      display: none;
+      margin: 20px auto;
+    }
+
+    /* Subtle hover scaling for #container */
+    #container:hover {
+      box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
+      transition: box-shadow 0.5s ease;
+    }
+
+    /* RESPONSIVE */
+    @media screen and (max-width: 600px) {
+      #container {
+        width: 90%;
+        padding: 20px;
+      }
+
+      h1 {
+        font-size: 1.5rem;
+      }
+
+      label,
+      input[type="submit"],
+      button,
+      textarea {
+        font-size: 0.85rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="container">
+    <h1>Lua Obfuscator</h1>
+    <form id="luaForm">
+      <label for="luaCode">Enter Lua Code:</label>
+      <textarea
+        id="luaCode"
+        name="luaCode"
+        rows="10"
+        cols="50"
+        onfocus="clearDefaultText(this)"
+        onblur="setDefaultText(this)"
+      >Enter your Lua code here.</textarea>
+      <br />
+      <input type="submit" value="Obfuscate" />
+    </form>
+
+    <button id="downloadButton">Download Obfuscated Script</button>
+    <h2>Obfuscated Script:</h2>
+    <pre id="encodedOutput" readonly>Obfuscated code will appear here after obfuscation.</pre>
+  </div>
+
+  <script>
+    document.getElementById("luaForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+      const luaCode = document.getElementById("luaCode").value;
+      const encodedOutput = document.getElementById("encodedOutput");
+      const downloadButton = document.getElementById("downloadButton");
+
+      // If input is empty or still default text, show error message
+      if (luaCode.trim() === "" || luaCode === "Enter your Lua code here.") {
+        encodedOutput.textContent = "Please enter a script.";
+        downloadButton.style.display = "none";
+      } else {
+        minifyAndObfuscate(luaCode);
+      }
+    });
+
+    function minifyAndObfuscate(luaCode) {
+      // Remove Lua comments and extra spaces
+      const minifiedLua = luaCode
+        .replace(/--.*$/gm, "")
+        .replace(/\s+/g, " ");
+
+      // Replace each character with its escaped ASCII code
+      const encoded = minifiedLua.replace(/./g, function (bb) {
+        const byteValue = bb.charCodeAt(0);
+        return "\\" + byteValue;
+      });
+
+      // The loadstring-based wrapper
+      const loadstringCall = `function IllIlllIllIlllIlllIlllIll(IllIlllIllIllIll) if (IllIlllIllIllIll==(((((919 + 636)-636)*3147)/3147)+919)) then return not true end if (IllIlllIllIllIll==(((((968 + 670)-670)*3315)/3315)+968)) then return not false end end; local IIllllIIllll = (7*3-9/9+3*2/0+3*3);local IIlllIIlllIIlllIIlllII = (3*4-7/7+6*4/3+9*9); function IllIIIIllIIIIIl(IIllllIIllll) function IIllllIIllll(IIllllIIllll) function IIllllIIllll(IllIllIllIllI) end end end;IllIIIIllIIIIIl(900283);function IllIlllIllIlllIlllIlllIllIlllIIIlll(IIlllIIlllIIlllIIlllII) function IIllllIIllll(IllIllIllIllI) local IIlllIIlllIIlllIIlllII = (9*0-7/5+3*1/3+8*2) end end;IllIlllIllIlllIlllIlllIllIlllIIIlll(9083);local IllIIllIIllIII = loadstring;local IlIlIlIlIlIlIlIlII = "${encoded}"IllIIllIIllIII(IlIlIlIlIlIlIlIlII,IIIIIIIIllllllllIIIIIIII)()`;
+
+      // Display it
+      const encodedOutput = document.getElementById("encodedOutput");
+      encodedOutput.textContent = loadstringCall;
+
+      const downloadButton = document.getElementById("downloadButton");
+      downloadButton.style.display = "inline-block";
+
+      downloadButton.addEventListener("click", function () {
+        const encodedBlob = new Blob([loadstringCall], {
+          type: "text/plain;charset=utf-8",
+        });
+        const downloadLink = document.createElement("a");
+        downloadLink.href = URL.createObjectURL(encodedBlob);
+        downloadLink.download = "obfuscated_script.txt";
+        downloadLink.style.display = "none";
+
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+      });
+    }
+
+    function clearDefaultText(element) {
+      if (element.value === "Enter your Lua code here.") {
+        element.value = "";
+      }
+    }
+
+    function setDefaultText(element) {
+      if (element.value === "") {
+        element.value = "Enter your Lua code here.";
+      }
+    }
+  </script>
+</body>
+</html>
