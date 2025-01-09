@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Lua Obfuscator (Glassmorphism Edition)</title>
+  <title>Luau Obfuscator</title>
   <meta charset="UTF-8" />
   <link rel="shortcut icon" href="img/favicon.ico" />
   <!-- Google Font -->
@@ -25,15 +25,14 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
     }
 
     /* CONTAINER WITH GLASSMORPHISM */
     #container {
       position: relative;
       width: 80%;
-      max-width: 800px;
-      margin: 20px auto;
+      max-width: 900px;
+      margin: 40px auto;
       padding: 30px;
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.1);
@@ -41,8 +40,8 @@
       box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
 
       /* Fade-in animation */
-      opacity: 0;
       animation: fadeIn 1s ease forwards;
+      opacity: 0;
     }
 
     @keyframes fadeIn {
@@ -55,6 +54,7 @@
       text-align: center;
       font-weight: 600;
       margin-bottom: 20px;
+      font-size: 1.8rem;
     }
 
     form {
@@ -68,8 +68,12 @@
       margin-bottom: 10px;
     }
 
+    /* SCROLLABLE TEXTAREA */
     textarea {
       width: 90%;
+      max-width: 800px;
+      height: 200px;
+      max-height: 300px;
       padding: 12px;
       border: none;
       border-radius: 10px;
@@ -77,9 +81,11 @@
       backdrop-filter: blur(8px);
       color: #ffffff;
       font-size: 0.95rem;
-      resize: none;
+      resize: vertical;
       outline: none;
       transition: background 0.3s;
+      overflow-y: scroll;
+      margin-bottom: 10px;
     }
 
     textarea:focus {
@@ -116,7 +122,11 @@
       font-weight: 500;
     }
 
+    /* SCROLLABLE PRE */
     pre {
+      width: 90%;
+      max-width: 800px;
+      margin: 0 auto;
       white-space: pre-wrap;
       word-wrap: break-word;
       background-color: rgba(255, 255, 255, 0.15);
@@ -129,6 +139,8 @@
       user-select: none;
       pointer-events: none;
       transition: background 0.3s;
+      overflow-y: auto;
+      max-height: 300px;
     }
 
     pre:hover {
@@ -163,23 +175,26 @@
       textarea {
         font-size: 0.85rem;
       }
+
+      pre {
+        font-size: 0.8rem;
+      }
     }
   </style>
 </head>
 
 <body>
   <div id="container">
-    <h1>Lua Obfuscator</h1>
+    <h1>Luau Obfuscator</h1>
     <form id="luaForm">
-      <label for="luaCode">Enter Lua Code:</label>
+      <label for="luaCode">Enter Luau Code:</label>
       <textarea
         id="luaCode"
         name="luaCode"
         rows="10"
-        cols="50"
         onfocus="clearDefaultText(this)"
         onblur="setDefaultText(this)"
-      >Enter your Lua code here.</textarea>
+      >Enter your Luau code here.</textarea>
       <br />
       <input type="submit" value="Obfuscate" />
     </form>
@@ -197,7 +212,7 @@
       const downloadButton = document.getElementById("downloadButton");
 
       // If input is empty or still default text, show error message
-      if (luaCode.trim() === "" || luaCode === "Enter your Lua code here.") {
+      if (luaCode.trim() === "" || luaCode === "Enter your Luau code here.") {
         encodedOutput.textContent = "Please enter a script.";
         downloadButton.style.display = "none";
       } else {
@@ -207,13 +222,14 @@
 
     function minifyAndObfuscate(luaCode) {
       // Remove Lua comments and extra spaces
+      // (Though it's 'Luau', the same patterns for comments and whitespace apply)
       const minifiedLua = luaCode
-        .replace(/--.*$/gm, "")
-        .replace(/\s+/g, " ");
+        .replace(/--.*$/gm, "") // Remove single-line comments
+        .replace(/\s+/g, " "); // Replace multiple spaces with one
 
       // Replace each character with its escaped ASCII code
-      const encoded = minifiedLua.replace(/./g, function (bb) {
-        const byteValue = bb.charCodeAt(0);
+      const encoded = minifiedLua.replace(/./g, function (char) {
+        const byteValue = char.charCodeAt(0);
         return "\\" + byteValue;
       });
 
@@ -221,13 +237,14 @@
       const loadstringCall = `function IllIlllIllIlllIlllIlllIll(IllIlllIllIllIll) if (IllIlllIllIllIll==(((((919 + 636)-636)*3147)/3147)+919)) then return not true end if (IllIlllIllIllIll==(((((968 + 670)-670)*3315)/3315)+968)) then return not false end end; local IIllllIIllll = (7*3-9/9+3*2/0+3*3);local IIlllIIlllIIlllIIlllII = (3*4-7/7+6*4/3+9*9); function IllIIIIllIIIIIl(IIllllIIllll) function IIllllIIllll(IIllllIIllll) function IIllllIIllll(IllIllIllIllI) end end end;IllIIIIllIIIIIl(900283);function IllIlllIllIlllIlllIlllIllIlllIIIlll(IIlllIIlllIIlllIIlllII) function IIllllIIllll(IllIllIllIllI) local IIlllIIlllIIlllIIlllII = (9*0-7/5+3*1/3+8*2) end end;IllIlllIllIlllIlllIlllIllIlllIIIlll(9083);local IllIIllIIllIII = loadstring;local IlIlIlIlIlIlIlIlII = "${encoded}"IllIIllIIllIII(IlIlIlIlIlIlIlIlII,IIIIIIIIllllllllIIIIIIII)()`;
 
       // Display it
-      const encodedOutput = document.getElementById("encodedOutput");
-      encodedOutput.textContent = loadstringCall;
+      document.getElementById("encodedOutput").textContent = loadstringCall;
 
+      // Show download button
       const downloadButton = document.getElementById("downloadButton");
       downloadButton.style.display = "inline-block";
 
-      downloadButton.addEventListener("click", function () {
+      // Download logic
+      downloadButton.onclick = function () {
         const encodedBlob = new Blob([loadstringCall], {
           type: "text/plain;charset=utf-8",
         });
@@ -239,18 +256,18 @@
         document.body.appendChild(downloadLink);
         downloadLink.click();
         document.body.removeChild(downloadLink);
-      });
+      };
     }
 
     function clearDefaultText(element) {
-      if (element.value === "Enter your Lua code here.") {
+      if (element.value === "Enter your Luau code here.") {
         element.value = "";
       }
     }
 
     function setDefaultText(element) {
       if (element.value === "") {
-        element.value = "Enter your Lua code here.";
+        element.value = "Enter your Luau code here.";
       }
     }
   </script>
